@@ -94,6 +94,7 @@ app.post("/login", async (request, response) => {
 
 app.post("/upload/", async (req, res) => {
   let data = req.body;
+
   console.log(data);
 
   let placeholders = data
@@ -118,4 +119,13 @@ app.get("/data/", async (request, response) => {
   const result = await database.all(getData);
 
   response.send(result);
+});
+
+app.delete("/clear/", async (request, response) => {
+  const deleteQuery = `
+    DELETE FROM datastore;`;
+
+  await database.run(deleteQuery);
+
+  response.send("Deleted");
 });
