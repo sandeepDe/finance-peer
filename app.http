@@ -1,49 +1,40 @@
-GET http://localhost:3000/todos/?status=TO%20DO
+GET http://localhost:3000/user/
+
 
 ###
 
-GET http://localhost:3000/todos/?priority=HIGH
-
-###
-GET http://localhost:3000/todos/?priority=HIGH&status=DONE
-
-###
-
-GET http://localhost:3000/todos/?search_q=Buy
-
-###
-
-GET http://localhost:3000/todos/?category=WORK&status=DONE
-
-###
-GET http://localhost:3000/todos/?category=HOME
-
-###
-GET http://localhost:3000/todos/?category=LEARNING&priority=HIGH
-
-###
-GET http://localhost:3000/todos/1/
-
-###
-GET http://localhost:3000/agenda/?date=2021/02/22
-
-###
-POST http://localhost:3000/todos/
+POST http://localhost:3000/register/ 
 Content-Type: application/json
 
 {
-  "id": 6,
-  "todo": "Finalize event theme",
-  "priority": "LOW",
-  "status": "TO DO",
-  "category": "HOME",
-  "dueDate": "2021-02-san"
+    "username":"henry",
+    "password": "henry_the_developer"
+
 }
 
 ###
-PUT http://localhost:3000/todos/1/
+POST http://localhost:3000/login/
 Content-Type: application/json
 
 {
-  "category": "LEARNING"
+    "username": "girish",
+    "password": "girish@1"
 }
+
+###
+POST http://localhost:3000/upload/ 
+Content-Type: application/json 
+
+[
+    {
+        "userId" : "1" ,
+        "id":"1" ,
+        "title":"Durgamma",
+        "body":"Jai Durgamma"
+    }
+]
+
+
+###
+
+GET http://localhost:3000/data/

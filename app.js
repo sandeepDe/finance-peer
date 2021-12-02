@@ -2,7 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 const { open } = require("sqlite");
 const sqlite3 = require("sqlite3");
@@ -30,6 +34,7 @@ const initializeDBAndServer = async () => {
 initializeDBAndServer();
 
 app.get("/user/", async (request, response) => {
+  console.log("triggered");
   const getQuery = `
     SELECT * FROM user;`;
 
@@ -57,16 +62,16 @@ app.post("/register/", async (request, response) => {
         )`;
     const dbResponse = await database.run(createUserQuery);
     const newUserId = dbResponse.lastID;
-    response.send(`Created new user with ${newUserId}`);
+    response.send({ msg: `Created new user with ${newUserId}` });
   } else {
     response.status = 400;
-    response.send("User already exists");
+    response.send({ err_msg: "User already exists" });
   }
 });
 
 app.post("/login", async (request, response) => {
   const { username, password } = request.body;
-  //console.log(username);
+  console.log("logged properly");
 
   const getQuery = `
   SELECT * FROM user WHERE username = '${request.body.username}';`;
@@ -74,8 +79,8 @@ app.post("/login", async (request, response) => {
   const dbUser = await database.get(getQuery);
 
   if (dbUser === undefined) {
-    response.send("Invalid User");
-    response.status(401);
+    response.send({ err_msg: "Invalid User" });
+    response.status(400);
   } else {
     const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
     console.log(isPasswordMatched);
@@ -87,7 +92,35 @@ app.post("/login", async (request, response) => {
       response.send({ jwtToken });
     } else {
       response.status(400);
-      response.send("Invalid Password");
+      response.send({ err_msg: "Invalid Password" });
     }
   }
+});
+
+app.post("/upload/", async (req, res) => {
+  let data = req.body;
+  console.log(data);
+
+  let placeholders = data
+    .map((s) => `(${s.userId},${s.id}, '${s.title}', '${s.body}')`)
+    .join(", ");
+
+  let postQuery =
+    `INSERT INTO datastore(user_id , id , title , body) VALUES ` +
+    placeholders +
+    ";";
+
+  console.log(postQuery);
+  const dbResponse = await database.run(postQuery);
+  const userId = dbResponse.lastID;
+  res.send({ msg: "Added" });
+});
+
+app.get("/data/", async (request, response) => {
+  const getData = `
+    SELECT * FROM datastore;`;
+
+  const result = await database.all(getData);
+
+  response.send(result);
 });
