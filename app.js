@@ -68,31 +68,26 @@ app.post("/register/", async (request, response) => {
     response.send({ err_msg: "User already exists" });
   }
 });
-
 app.post("/login", async (request, response) => {
   const { username, password } = request.body;
-  console.log("logged properly");
-
-  const getQuery = `
-  SELECT * FROM user WHERE username = '${request.body.username}';`;
-
-  const dbUser = await database.get(getQuery);
-
+  const selectUserQuery = `SELECT * FROM user WHERE username = '${username}'`;
+  const dbUser = await database.get(selectUserQuery);
   if (dbUser === undefined) {
-    response.send({ err_msg: "Invalid User" });
     response.status(400);
+    response.send("Invalid User");
   } else {
     const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
-    console.log(isPasswordMatched);
     if (isPasswordMatched === true) {
       const payload = {
         username: username,
       };
       const jwtToken = jwt.sign(payload, "MY_SECRET_TOKEN");
-      response.send({ jwtToken });
+      response.send({ jwt_token: jwtToken });
     } else {
+      // console.log("error");
+
       response.status(400);
-      response.send({ err_msg: "Invalid Password" });
+      response.send({ msg: "hello" });
     }
   }
 });
